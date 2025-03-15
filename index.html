@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Pretty Digital Diary 🌸</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap');
+
+        body {
+            font-family: 'Dancing Script', cursive;
+            background: linear-gradient(to right, #ff9a9e, #fad0c4);
+            text-align: center;
+            color: #5a2d2d;
+            margin: 0;
+            padding: 0;
+            transition: 0.5s;
+        }
+        .night-mode {
+            background: linear-gradient(to right, #2c3e50, #4b6584);
+            color: white;
+        }
+        #lockScreen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        input[type="password"] {
+            padding: 10px;
+            font-size: 20px;
+            border: 3px solid #ff4e50;
+            border-radius: 10px;
+            text-align: center;
+        }
+        button {
+            background: #ff4e50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            margin: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #ff7675;
+            transform: scale(1.05);
+        }
+        #diaryContainer {
+            display: none;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        textarea {
+            width: 100%;
+            height: 300px;
+            border: 2px solid #ff7eb3;
+            padding: 15px;
+            font-size: 18px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            font-family: 'Dancing Script', cursive;
+        }
+        .page-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        #nightModeBtn {
+            background: #4b6584;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="lockScreen">
+        <h2>🔒 Enter Password to Unlock Your Diary 🌸</h2>
+        <input type="password" id="passwordInput" placeholder="Enter Password">
+        <button onclick="unlockDiary()">Unlock</button>
+    </div>
+
+    <div id="diaryContainer">
+        <h1>My Pretty Digital Diary 💖</h1>
+        <h3>Page <span id="pageNumber">1</span></h3>
+        <textarea id="diaryEntry" placeholder="Write your thoughts here..."></textarea>
+
+        <div class="page-controls">
+            <button onclick="prevPage()">◀ Previous</button>
+            <button onclick="newPage()">➕ New Page</button>
+            <button onclick="nextPage()">Next ▶</button>
+        </div>
+
+        <button id="nightModeBtn" onclick="toggleNightMode()">🌙 Night Mode</button>
+        <button onclick="toggleMusic()">🎵 Toggle Music</button>
+        <audio id="bgMusic" loop>
+            <source src="https://www.bensound.com/bensound-music/bensound-sweet.mp3" type="audio/mp3">
+        </audio>
+    </div>
+
+    <script>
+        let currentPage = localStorage.getItem('currentPage') ? parseInt(localStorage.getItem('currentPage')) : 1;
+        let diaryPages = JSON.parse(localStorage.getItem('diaryPages')) || { 1: "" };
+        let nightMode = localStorage.getItem('nightMode') === "true";
+
+        function unlockDiary() {
+            const password = document.getElementById('passwordInput').value;
+            if (password === "101005") {
+                document.getElementById('lockScreen').style.display = 'none';
+                document.getElementById('diaryContainer').style.display = 'block';
+                loadPage(currentPage);
+                if (nightMode) document.body.classList.add("night-mode");
+            } else {
+                alert("❌ Wrong password! Try again.");
+            }
+        }
+
+        function loadPage(page) {
+            if (!diaryPages[page]) diaryPages[page] = "";
+            document.getElementById('pageNumber').innerText = page;
+            document.getElementById('diaryEntry').value = diaryPages[page];
+            localStorage.setItem('diaryPages', JSON.stringify(diaryPages));
+            localStorage.setItem('currentPage', page);
+        }
+
+        document.getElementById('diaryEntry').addEventListener('input', function() {
+            diaryPages[currentPage] = this.value;
+            localStorage.setItem('diaryPages', JSON.stringify(diaryPages));
+        });
+
+        function nextPage() {
+            currentPage++;
+            loadPage(currentPage);
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                loadPage(currentPage);
+            }
+        }
+
+        function newPage() {
+            currentPage = Object.keys(diaryPages).length + 1;
+            loadPage(currentPage);
+        }
+
+        function toggleNightMode() {
+            document.body.classList.toggle("night-mode");
+            nightMode = !nightMode;
+            localStorage.setItem('nightMode', nightMode);
+        }
+
+        function toggleMusic() {
+            let music = document.getElementById("bgMusic");
+            if (music.paused) {
+                music.play();
+            } else {
+                music.pause();
+            }
+        }
+    </script>
+
+</body>
+</html>
